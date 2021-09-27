@@ -13,14 +13,15 @@ app.get('/', (req, res) => {
   res.send('Hello!')
 });
 
-app.get('/urls', (req, res) => {
-  res.json(urlDatabase);
-})
-
 app.get('/hello', (req, res) => {
   res.send
     ('<html><body> <h1> Hello again from HTML</h1></body></html>')
 });
+
+app.get('/urls', (req, res) => {
+  const templateVars = { urls: urlDatabase };
+  res.render('urls_index', templateVars);
+})
 
 //Test Codes
 // app.get("/set", (req, res) => {
