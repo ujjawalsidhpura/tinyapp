@@ -21,20 +21,14 @@ app.get('/hello', (req, res) => {
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
-})
+});
 
-//Test Codes
-// app.get("/set", (req, res) => {
-//   const a = 1;
-//   res.send(`a = ${a}`);
-// });
-
-// app.get("/fetch", (req, res) => {
-//   res.send(`a = ${a}`);
-// });
-
-
+app.get('/urls/:shortURL', (req, res) => {
+  const shortURL = req.params.shortURL;
+  const templateVars = { shortURL: shortURL, longURL: urlDatabase[shortURL] };
+  res.render('urls_show', templateVars);
+});
 
 app.listen(PORT, () => {
   console.log(`App listening to ${PORT}`);
-})
+});
