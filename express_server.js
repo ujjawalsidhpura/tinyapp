@@ -31,9 +31,18 @@ app.get('/urls/new', (req, res) => {
 
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
+  //req.body is the object where FORM is sending the POST request of longURL. so to access it, we can do req.body.longURL
+  //Similarly, to inject shortURL generated ramdomly by our func, we inject into req.body object but the following command
   req.body.shortURL = shortURL;
-  console.log(req.body);
-  res.send('OK');
+
+  // We have shortURL and LongURl. We can inject that into our Original Database object
+  urlDatabase[shortURL] = longURL;
+
+  //Console log to double check
+  console.log(urlDatabase);
+
+  res.redirect(`/urls/${shortURL}`);
 })
 
 app.get('/urls/:shortURL', (req, res) => {
