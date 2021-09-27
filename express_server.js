@@ -45,11 +45,21 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 })
 
+app.get("/u/:shortURL", (req, res) => {
+  //You can get shortURL from req.params object and since form is submitted, urldatabase should have key:value pair of shortURL:longURL. Hence you can access longURL from urlDatabase
+
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL];
+
+  res.redirect(longURL);
+});
+
 app.get('/urls/:shortURL', (req, res) => {
   // /url/:shortURL is found in req.params object 
   const shortURL = req.params.shortURL;
   const templateVars =
     { shortURL: shortURL, longURL: urlDatabase[shortURL] };
+
   res.render('urls_show', templateVars);
 });
 
