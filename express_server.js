@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const PORT = 8080;
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set('view engine', 'ejs');
 
@@ -9,24 +11,18 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-app.get('/', (req, res) => {
-  res.send('Hello!')
-});
-
-app.get('/hello', (req, res) => {
-  res.send
-    ('<html><body> <h1> Hello again from HTML</h1></body></html>')
-});
-
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
 });
 
+//GET route to Present FORM to the user(browser).GETTING the form from server to the user. Server will respond with urls_new and using ejs, it will render an HTML form.
+app.get('/urls/new', (req, res) => {
+  res.render('urls_new');
+})
 
 app.get('/urls/:shortURL', (req, res) => {
   // /url/:shortURL is found in req.params object 
-
   const shortURL = req.params.shortURL;
   const templateVars =
     { shortURL: shortURL, longURL: urlDatabase[shortURL] };
