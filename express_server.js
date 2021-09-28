@@ -70,7 +70,20 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
 //UPDATE the entry in Database
 
+app.post('/urls/:shortURL/update', (req, res) => {
 
+  // console.log('Params', req.params)
+  // console.log('Body', req.body)
+  // As we can see from console, ShortURL came from params, longURL came from body.
+
+  const longURL = req.body.longURL;
+  const shortURL = req.params.shortURL;
+
+  //Update
+  urlDatabase[shortURL] = longURL;
+
+  res.redirect('/urls')
+})
 
 
 app.get("/u/:shortURL", (req, res) => {
