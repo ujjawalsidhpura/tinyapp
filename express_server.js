@@ -23,13 +23,20 @@ function generateRandomString() {
 }
 
 app.get('/urls', (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies['username']
+  };
   res.render('urls_index', templateVars);
 });
 
 //GET route to Present FORM to the user(browser).GETTING the form from server to the user. Server will respond with urls_new and using ejs, it will render an HTML form.
 app.get('/urls/new', (req, res) => {
-  res.render('urls_new');
+
+  const templateVars = {
+    username: req.cookies['username']
+  }
+  res.render('urls_new', templateVars);
 })
 
 app.post('/urls', (req, res) => {
@@ -57,7 +64,11 @@ app.get('/urls/:shortURL', (req, res) => {
 
   const shortURL = req.params.shortURL;
   const templateVars =
-    { shortURL: shortURL, longURL: urlDatabase[shortURL] };
+  {
+    shortURL: shortURL,
+    longURL: urlDatabase[shortURL],
+    username: req.cookies['username']
+  };
 
   res.render('urls_show', templateVars);
 });
@@ -90,7 +101,12 @@ app.post('/urls/:shortURL/update', (req, res) => {
 
 //LOGIN and COOKIE Functionality
 
+app.post('/login', (req, res) => {
+  const username = req.body.username;
+  res.cookie('username', username);
 
+  res.redirect('/urls');
+})
 
 app.get("/u/:shortURL", (req, res) => {
   //You can get shortURL from req.params object and since form is submitted, urldatabase should have key:value pair of shortURL:longURL. Hence you can access longURL from urlDatabase
