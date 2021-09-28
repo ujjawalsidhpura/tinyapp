@@ -12,6 +12,8 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
+    
+    <!-- TO check if user is present, if present welcome or else register -->
 
     <% if(!username) { %>
       <!-- Login Registration Form -->
@@ -26,7 +28,17 @@
         </div>
       </form>
       <% } else { %>
-        <h3> Welcome <%= username %></h3>
+        <!-- LogOut form -->
+        <form class="form-inline" action="/logout" method="POST" name="logout">
+          <div class="form-group mb-2">
+            <label class="form-control font-weight-bold" for="logout"> Welcome <%= username %>
+            </label>
+    
+            <button type="submit" class="btn btn-warning font-weight-bold">
+             Log Out
+            </button>
+          </div>
+        
         <% } %>
   </nav>
 </header>
