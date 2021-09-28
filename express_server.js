@@ -88,6 +88,9 @@ app.post('/urls/:shortURL/update', (req, res) => {
   res.redirect('/urls')
 })
 
+//LOGIN and COOKIE Functionality
+
+
 
 app.get("/u/:shortURL", (req, res) => {
   //You can get shortURL from req.params object and since form is submitted, urldatabase should have key:value pair of shortURL:longURL. Hence you can access longURL from urlDatabase
