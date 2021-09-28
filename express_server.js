@@ -99,7 +99,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
   res.redirect('/urls')
 })
 
-//LOGIN and COOKIE Functionality
+//LOGIN/LOGOUT and COOKIE Functionality
 
 app.post('/login', (req, res) => {
   const username = req.body.username;
