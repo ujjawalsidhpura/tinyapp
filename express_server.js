@@ -14,7 +14,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-//function 
+//Helper Function 
 function generateRandomString() {
   return Math.random().toString(20).substr(2, 6);
 }
@@ -32,18 +32,46 @@ app.get('/urls/new', (req, res) => {
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
-  //req.body is the object where FORM is sending the POST request of longURL. so to access it, we can do req.body.longURL
-  //Similarly, to inject shortURL generated ramdomly by our func, we inject into req.body object but the following command
+  //req.body is the object where FORM is sending the POST request of longURL. So to access it, we can do 'req.body.longURL'.
+  //Similarly, to inject shortURL generated ramdomly by our func, we inject into req.body object by the following command below-->
   req.body.shortURL = shortURL;
 
-  // We have shortURL and LongURl. We can inject that into our Original Database object
+  // We have shortURL and LongURl. We can inject that into our Original Database object with key:value pair -->
   urlDatabase[shortURL] = longURL;
 
-  //Console log to double check
+  //Console log to double-check
   console.log(urlDatabase);
+
+  //Once form is submitted, Redirect to with the current shortURL as parameter. It will call app.get('urls/:shortURL'). 
 
   res.redirect(`/urls/${shortURL}`);
 })
+
+//IMP-> ':' before shortURL signifies that shortURL is added dynamically. We do not use ':' for actual output.-->
+
+app.get('/urls/:shortURL', (req, res) => {
+  // app.get takes user request urls/:${shortURL} and it is added in  req.params object
+
+  const shortURL = req.params.shortURL;
+  const templateVars =
+    { shortURL: shortURL, longURL: urlDatabase[shortURL] };
+
+  res.render('urls_show', templateVars);
+});
+
+//DELETING the entry from Database
+app.post('/urls/:shortURL/delete', (req, res) => {
+  const shortURL = req.params.shortURL;
+  //delete the item
+  delete urlDatabase[shortURL];
+
+  res.redirect('/urls');
+})
+
+//UPDATE the entry in Database
+
+
+
 
 app.get("/u/:shortURL", (req, res) => {
   //You can get shortURL from req.params object and since form is submitted, urldatabase should have key:value pair of shortURL:longURL. Hence you can access longURL from urlDatabase
@@ -52,15 +80,6 @@ app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[shortURL];
 
   res.redirect(longURL);
-});
-
-app.get('/urls/:shortURL', (req, res) => {
-  // /url/:shortURL is found in req.params object 
-  const shortURL = req.params.shortURL;
-  const templateVars =
-    { shortURL: shortURL, longURL: urlDatabase[shortURL] };
-
-  res.render('urls_show', templateVars);
 });
 
 app.listen(PORT, () => {
