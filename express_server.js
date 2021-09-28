@@ -1,6 +1,9 @@
 const express = require('express');
+const cookieParser = require('cookie-parser')
 const app = express();
+app.use(cookieParser());
 const PORT = 8080;
+
 
 //Use body parser for FORM POST requests
 const bodyParser = require('body-parser');
