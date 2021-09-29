@@ -20,9 +20,19 @@ const users = {};
 
 //////////////////////////////////////////////////////////////
 
-//Helper Function 
+//Helper Functions 
 function generateRandomString() {
   return Math.random().toString(20).substr(2, 6);
+}
+
+function checkUser(email, users) {
+  for (let user in users) {
+    const temp = users[user].email;
+    if (temp === email) {
+      return user;
+    }
+  }
+  return false;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -132,15 +142,26 @@ app.get('/register', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  //Create newUser using reg form data
   const userId = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
-  const newUser = { userId, email, password };
 
+  if (email === '' || password === '') {
+    res.status(401).send('<h2> Please enter a valid email/password. </h2>');
+    return;
+  }
+  //Check if the user already exists
+  let newUser = checkUser(email, users);
+  if (newUser) {
+    res.status(401).send('<h2>User already registered. Please login</h2>')
+  } else {
+    //Create newUser using reg form data (if user does not already exist)
+    newUser = { userId, email, password };
+  }
   //Add newUser to Users database
   users[userId] = newUser;
 
+  console.log(users)
   //Set cookies for newUser
   res.cookie('user_id', userId)
 
