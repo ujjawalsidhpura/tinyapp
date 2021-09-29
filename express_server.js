@@ -27,18 +27,19 @@ function generateRandomString() {
 
 ////////////////////////////////////////////////////////////////////
 app.get('/urls', (req, res) => {
+  const user_id = req.cookies['user_id']
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies['username']
+    user: users[user_id]
   };
   res.render('urls_index', templateVars);
 });
 
 //GET route to Present FORM to the user(browser).GETTING the form from server to the user. Server will respond with urls_new and using ejs, it will render an HTML form.
 app.get('/urls/new', (req, res) => {
-
+  const user_id = req.cookies['user_id']
   const templateVars = {
-    username: req.cookies['username']
+    user: users[user_id]
   }
   res.render('urls_new', templateVars);
 })
@@ -54,7 +55,7 @@ app.post('/urls', (req, res) => {
   urlDatabase[shortURL] = longURL;
 
   //Console log to double-check
-  console.log(urlDatabase);
+  // console.log(urlDatabase);
 
   //Once form is submitted, Redirect to with the current shortURL as parameter. It will call app.get('urls/:shortURL'). 
 
@@ -66,13 +67,13 @@ app.post('/urls', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   // app.get takes user request urls/:${shortURL} and it is added in  req.params object
-
+  const user_id = req.cookies['user_id']
   const shortURL = req.params.shortURL;
   const templateVars =
   {
     shortURL: shortURL,
     longURL: urlDatabase[shortURL],
-    username: req.cookies['username']
+    user: users[user_id]
   };
 
   res.render('urls_show', templateVars);
@@ -108,13 +109,13 @@ app.post('/urls/:shortURL/update', (req, res) => {
 
 app.post('/login', (req, res) => {
   const username = req.body.username;
-  res.cookie('username', username);
+  res.cookie('user_id', username);
 
   res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
@@ -123,8 +124,9 @@ app.post('/logout', (req, res) => {
 //Registration
 
 app.get('/register', (req, res) => {
+  const user_id = req.cookies['user_id']
   const templateVars = {
-    username: req.cookies['username']
+    user: users[user_id]
   }
   res.render('urls_register', templateVars)
 });
@@ -142,7 +144,6 @@ app.post('/register', (req, res) => {
   //Set cookies for newUser
   res.cookie('user_id', userId)
 
-  console.log(users)
   res.redirect('/urls')
 })
 

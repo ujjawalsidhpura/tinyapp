@@ -15,7 +15,7 @@
     
     <!-- TO check if user is present, if present welcome or else register -->
 
-    <% if(!username) { %>
+    <% if(!user) { %>
       <!-- Login Form -->
       <form class="form-inline" action="/login" method="POST">
         <div class="form-group mb-2">
@@ -42,7 +42,7 @@
         <!-- LogOut form -->
         <form class="form-inline" action="/logout" method="POST" name="logout">
           <div class="form-group mb-2">
-            <label class="form-control font-weight-bold" for="logout"> Welcome <%= username %>
+            <label class="form-control font-weight-bold" for="logout"> Welcome <%= user.email %>
             </label>
     
             <button type="submit" class="btn btn-warning font-weight-bold">
