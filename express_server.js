@@ -133,6 +133,10 @@ app.post('/login', (req, res) => {
 
   if (user) {
     if (user.password === password) {
+      //Finding and applying cookies
+      const userId = user.userId;
+      res.cookie('user_id', userId)
+      //Then redirect the page to appropriate header
       res.redirect('/urls');
       return;
     } else {
@@ -142,11 +146,6 @@ app.post('/login', (req, res) => {
   } else {
     res.status(403).send(`No user named : '${email}' found`);
   }
-
-  //Finding and applying cookies
-  const userId = user.userId;
-  res.cookie('user_id', userId)
-
 })
 
 app.post('/logout', (req, res) => {
