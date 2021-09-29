@@ -13,9 +13,16 @@ app.set('view engine', 'ejs');
 
 //Database
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW"
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW"
+  }
 };
+
 const users = {};
 
 //////////////////////////////////////////////////////////////
@@ -45,7 +52,6 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-//GET route to Present FORM to the user(browser).GETTING the form from server to the user. Server will respond with urls_new and using ejs, it will render an HTML form.
 app.get('/urls/new', (req, res) => {
   const user_id = req.cookies['user_id']
   const templateVars = {
@@ -54,15 +60,21 @@ app.get('/urls/new', (req, res) => {
   res.render('urls_new', templateVars);
 })
 
-app.post('/urls', (req, res) => {
+app.post('/new', (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
+  const userId = req.cookies['user_id']
+
+  console.log('short', shortURL)
+  console.log('long', longURL)
+  console.log('cookie', userId)
+
   //req.body is the object where FORM is sending the POST request of longURL. So to access it, we can do 'req.body.longURL'.
   //Similarly, to inject shortURL generated ramdomly by our func, we inject into req.body object by the following command below-->
   req.body.shortURL = shortURL;
 
   // We have shortURL and LongURl. We can inject that into our Original Database object with key:value pair -->
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL] = { longURL, userId }
 
   //Console log to double-check
   // console.log(urlDatabase);
@@ -71,8 +83,9 @@ app.post('/urls', (req, res) => {
 
   res.redirect(`/urls/${shortURL}`);
 })
-////////////////////////////////////////////////////////////////
 
+
+////////////////////////////////////////////////////////////////
 //IMP-> ':' before shortURL signifies that shortURL is added dynamically. We do not use ':' for actual output.-->
 
 app.get('/urls/:shortURL', (req, res) => {
@@ -82,7 +95,7 @@ app.get('/urls/:shortURL', (req, res) => {
   const templateVars =
   {
     shortURL: shortURL,
-    longURL: urlDatabase[shortURL],
+    longURL: urlDatabase[shortURL].longURL,
     user: users[user_id]
   };
 
