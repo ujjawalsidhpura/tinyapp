@@ -62,21 +62,6 @@ app.post('/urls', (req, res) => {
 })
 ////////////////////////////////////////////////////////////////
 
-//Registration
-
-app.get('/register', (req, res) => {
-  const templateVars = {
-    username: req.cookies['username']
-  }
-  res.render('urls_register', templateVars)
-});
-
-app.post('/register', (req, res) => {
-
-})
-
-
-//////////////////////////////////////////////////////////////////
 //IMP-> ':' before shortURL signifies that shortURL is added dynamically. We do not use ':' for actual output.-->
 
 app.get('/urls/:shortURL', (req, res) => {
@@ -135,6 +120,33 @@ app.post('/logout', (req, res) => {
 
 ////////////////////////////////////////////////////////////////////
 
+//Registration
+
+app.get('/register', (req, res) => {
+  const templateVars = {
+    username: req.cookies['username']
+  }
+  res.render('urls_register', templateVars)
+});
+
+app.post('/register', (req, res) => {
+  //Create newUser using reg form data
+  const userId = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+  const newUser = { userId, email, password };
+
+  //Add newUser to Users database
+  users[userId] = newUser;
+
+  //Set cookies for newUser
+  res.cookie('user_id', userId)
+
+  console.log(users)
+  res.redirect('/urls')
+})
+
+//////////////////////////////////////////////////////////////////
 app.get("/u/:shortURL", (req, res) => {
   //You can get shortURL from req.params object and since form is submitted, urldatabase should have key:value pair of shortURL:longURL. Hence you can access longURL from urlDatabase
 
