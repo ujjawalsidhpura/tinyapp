@@ -29,7 +29,7 @@ function checkUser(email, users) {
   for (let user in users) {
     const temp = users[user].email;
     if (temp === email) {
-      return user;
+      return users[user];
     }
   }
   return false;
@@ -117,17 +117,42 @@ app.post('/urls/:shortURL/update', (req, res) => {
 ////////////////////////////////////////////////////////////////////
 // LOGIN/LOGOUT and COOKIE Functionality
 
-app.post('/login', (req, res) => {
-  const username = req.body.username;
-  res.cookie('user_id', username);
+app.get('/login', (req, res) => {
+  const user_id = req.cookies['user_id'];
+  const templateVars = {
+    user: users[user_id]
+  }
+  res.render('urls_login', templateVars);
+})
 
-  res.redirect('/urls');
-});
+app.post('/login', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  const user = checkUser(email, users);
+
+  if (user) {
+    if (user.password === password) {
+      res.redirect('/urls');
+      return;
+    } else {
+      res.status(403).send('Password Incorrect! Please try again.');
+      return;
+    }
+  } else {
+    res.status(403).send(`No user named : '${email}' found`);
+  }
+
+  //Finding and applying cookies
+  const userId = user.userId;
+  res.cookie('user_id', userId)
+
+})
 
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls');
-});
+})
 
 ////////////////////////////////////////////////////////////////////
 
