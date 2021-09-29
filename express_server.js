@@ -4,24 +4,28 @@ const app = express();
 app.use(cookieParser());
 const PORT = 8080;
 
-
 //Use body parser for FORM POST requests
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set('view engine', 'ejs');
+////////////////////////////////////////////////////////////////////
 
 //Database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+const users = {};
+
+//////////////////////////////////////////////////////////////
 
 //Helper Function 
 function generateRandomString() {
   return Math.random().toString(20).substr(2, 6);
 }
 
+////////////////////////////////////////////////////////////////////
 app.get('/urls', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
@@ -56,7 +60,23 @@ app.post('/urls', (req, res) => {
 
   res.redirect(`/urls/${shortURL}`);
 })
+////////////////////////////////////////////////////////////////
 
+//Registration
+
+app.get('/register', (req, res) => {
+  const templateVars = {
+    username: req.cookies['username']
+  }
+  res.render('urls_register', templateVars)
+});
+
+app.post('/register', (req, res) => {
+
+})
+
+
+//////////////////////////////////////////////////////////////////
 //IMP-> ':' before shortURL signifies that shortURL is added dynamically. We do not use ':' for actual output.-->
 
 app.get('/urls/:shortURL', (req, res) => {
@@ -72,7 +92,7 @@ app.get('/urls/:shortURL', (req, res) => {
 
   res.render('urls_show', templateVars);
 });
-
+////////////////////////////////////////////////////////////////////
 //DELETING the entry from Database
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
@@ -81,7 +101,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
   res.redirect('/urls');
 })
-
+////////////////////////////////////////////////////////////////////
 //UPDATE the entry in Database
 
 app.post('/urls/:shortURL/update', (req, res) => {
@@ -98,20 +118,22 @@ app.post('/urls/:shortURL/update', (req, res) => {
 
   res.redirect('/urls')
 })
-
-//LOGIN/LOGOUT and COOKIE Functionality
+////////////////////////////////////////////////////////////////////
+// LOGIN/LOGOUT and COOKIE Functionality
 
 app.post('/login', (req, res) => {
   const username = req.body.username;
   res.cookie('username', username);
 
   res.redirect('/urls');
-})
+});
 
 app.post('/logout', (req, res) => {
   res.clearCookie('username');
   res.redirect('/urls');
-})
+});
+
+////////////////////////////////////////////////////////////////////
 
 app.get("/u/:shortURL", (req, res) => {
   //You can get shortURL from req.params object and since form is submitted, urldatabase should have key:value pair of shortURL:longURL. Hence you can access longURL from urlDatabase
