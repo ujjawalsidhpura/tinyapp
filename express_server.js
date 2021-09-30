@@ -45,45 +45,16 @@ const users = {
   //   '1da9g2': { userId: '1da9g2', email: 'x@gmail.com', password: '123' }
   // }
 };
+/////////////////////////// HELPER FUNCTIONS //////////////////////
 
-/////////////////////////// HELPER FUNCTIONS ///////////////////////////////////
-
-function generateRandomString() {
-  return Math.random().toString(20).substr(2, 6);
-}
-
-function checkUser(email, users) {
-  for (let user in users) {
-    const temp = users[user].email;
-    if (temp === email) {
-      return users[user];
-    }
-  }
-  return false;
-}
-
-function urlsForUser(id) {
-  let output = {};
-
-  for (let shortURL in urlDatabase) {
-    const urlObj = urlDatabase[shortURL]
-
-    if (id === urlObj.userId) {
-      output[shortURL] = urlObj.longURL
-    }
-  }
-  if (Object.keys(output).length === 0) {
-    return false;
-  }
-
-  return output
-}
+const { generateRandomString, checkUser, urlsForUser } =
+  require('./helpers')
 
 /////////////////////////// HOME PAGE ///////////////////////////////////
 
 app.get('/urls', (req, res) => {
   const user_id = req.session.user_id;
-  const urls = urlsForUser(user_id);
+  const urls = urlsForUser(user_id, urlDatabase);
 
   const templateVars = {
     urls: urls,
