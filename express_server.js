@@ -13,17 +13,24 @@ app.set('view engine', 'ejs');
 
 //Database
 const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userId: "aJ48lW"
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userId: "aJ48lW"
-  }
+  // Format as below-->
+  // b6UTxQ: {
+  //   longURL: "https://www.tsn.ca",
+  //   userId: "aJ48lW"
+  // },
+  // i3BoGr: {
+  //   longURL: "https://www.google.ca",
+  //   userId: "aJ48lW"
+  // }
 };
 
-const users = {};
+const users = {
+  // Format as below-->
+  // {
+  //   '8jej85': { userId: '8jej85', email: 'abc@gmail.com', password: '123' },
+  //   '1da9g2': { userId: '1da9g2', email: 'x@gmail.com', password: '123' }
+  // }
+};
 
 //////////////////////////////////////////////////////////////
 
