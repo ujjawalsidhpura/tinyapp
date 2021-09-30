@@ -15,11 +15,11 @@ app.set('view engine', 'ejs');
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
-    userID: "aJ48lW"
+    userId: "aJ48lW"
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
-    userID: "aJ48lW"
+    userId: "aJ48lW"
   }
 };
 
@@ -42,11 +42,30 @@ function checkUser(email, users) {
   return false;
 }
 
+function urlsForUser(id) {
+  let output = {};
+
+  for (let shortURL in urlDatabase) {
+    const urlObj = urlDatabase[shortURL]
+
+    if (id === urlObj.userId) {
+      output[shortURL] = urlObj.longURL
+    }
+  }
+  if (Object.keys(output).length === 0) {
+    return false;
+  }
+
+  return output
+}
+
 ////////////////////////////////////////////////////////////////////
 app.get('/urls', (req, res) => {
-  const user_id = req.cookies['user_id']
+  const user_id = req.cookies['user_id'];
+  const urls = urlsForUser(user_id);
+
   const templateVars = {
-    urls: urlDatabase,
+    urls: urls,
     user: users[user_id]
   };
   res.render('urls_index', templateVars);
@@ -55,6 +74,7 @@ app.get('/urls', (req, res) => {
 app.get('/urls/new', (req, res) => {
   const user_id = req.cookies['user_id']
   const templateVars = {
+    urls: urlDatabase,
     user: users[user_id]
   }
   res.render('urls_new', templateVars);
@@ -65,16 +85,13 @@ app.post('/new', (req, res) => {
   const longURL = req.body.longURL;
   const userId = req.cookies['user_id']
 
-  console.log('short', shortURL)
-  console.log('long', longURL)
-  console.log('cookie', userId)
-
   //req.body is the object where FORM is sending the POST request of longURL. So to access it, we can do 'req.body.longURL'.
   //Similarly, to inject shortURL generated ramdomly by our func, we inject into req.body object by the following command below-->
   req.body.shortURL = shortURL;
 
   // We have shortURL and LongURl. We can inject that into our Original Database object with key:value pair -->
   urlDatabase[shortURL] = { longURL, userId }
+  console.log(urlDatabase);
 
   //Console log to double-check
   // console.log(urlDatabase);
@@ -123,7 +140,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
   const shortURL = req.params.shortURL;
 
   //Update
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL].longURL = longURL;
 
   res.redirect('/urls')
 })
