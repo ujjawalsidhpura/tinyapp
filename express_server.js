@@ -1,4 +1,4 @@
-//Dependencies//
+///////////////////// DEPENDENCIES ///////////////////////////
 
 const express = require('express');
 const app = express();
@@ -12,6 +12,10 @@ app.use(cookieParser());
 //Body-parser
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
+
+//Password Encription
+const bcrypt = require('bcryptjs');
+const salt = bcrypt.genSaltSync(10);
 
 app.set('view engine', 'ejs');
 
@@ -181,7 +185,7 @@ app.post('/login', (req, res) => {
   //checkUser function will return a user object in format user : {id,email,password}
 
   if (user) {
-    if (user.password === password) {
+    if (bcrypt.compareSync(password, user.password)) {
       //Finding and applying cookies. Check inspect/application/cookies in browser to see what happens upon logIN
       const userId = user.userId;
       res.cookie('user_id', userId)
@@ -217,7 +221,8 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   const userId = generateRandomString();
   const email = req.body.email;
-  const password = req.body.password;
+  // const password = req.body.password; --> non hashed password
+  const password = bcrypt.hashSync(req.body.password, salt);
 
   if (email === '' || password === '') {
     res.status(401).send('<h2> Please enter a valid email/password. </h2>');
@@ -234,9 +239,6 @@ app.post('/register', (req, res) => {
   }
   //Add newUser to Users database
   users[userId] = newUser;
-
-  //Check users database
-  // console.log(users)
 
   //Set cookies for newUser. Use user's unique 'userId' as cookie.
   res.cookie('user_id', userId)
