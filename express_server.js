@@ -168,11 +168,11 @@ app.post('/login', (req, res) => {
       return;
     } else {
       //If password is Not correct
-      res.status(403).send('Password Incorrect! Please try again.');
+      res.status(403).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> Password Incorrect! Please try again.</div>');
       return;
     }
   } else {
-    res.status(403).send(`No user named : '${email}' found`);
+    res.status(403).send(`<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> No user named : '${email}' found.     </div>`);
   }
 });
 
@@ -201,14 +201,14 @@ app.post('/register', (req, res) => {
 
   //Check if either Inputs are empty
   if (email === '' || password === '') {
-    res.status(401).send('<h2> Please enter a valid email/password. </h2>');
+    res.status(401).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> Please Enter a valid E-Mail/Password</div>');
     return;
   }
   //Check if the user already exists
   let newUser = checkUser(email, users);
 
   if (newUser) {
-    res.status(401).send('<h2>User already registered. Please login</h2>')
+    res.status(401).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> User already Registered.Please login</div>')
   } else {
     //IF user does Not exist, then create newUser object using email,password and unique userId.
     newUser = { userId, email, password };
