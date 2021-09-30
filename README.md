@@ -4,9 +4,11 @@ TinyApp (it's not that tiny, really!!! ) is a full stack web application built w
 
 ## Final Product
 
-!["screenshot description"](#)
+!["User can see their URLs. Only a logged user have access to their URLs"](https://github.com/ujjawalsidhpura/tinyapp/blob/master/docs/userURLs.png?raw=true)
 
-!["screenshot description"](#)
+!["Login Page"](https://github.com/ujjawalsidhpura/tinyapp/blob/master/docs/userLogin.png?raw=true)
+
+!["User can create/add new URLs"](https://github.com/ujjawalsidhpura/tinyapp/blob/master/docs/createURL.png?raw=true)
 
 ## Dependencies
 
