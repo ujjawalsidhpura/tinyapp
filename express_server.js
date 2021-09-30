@@ -4,9 +4,12 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 
-//Cookie-parser
-const cookieParser = require('cookie-parser')
-app.use(cookieParser());
+//Cookie-Session (encrypted)
+const cookieSession = require('cookie-session')
+app.use(cookieSession({
+  name: 'session',
+  keys: ['Test This is my key one', 'This is just some jiberjibar']
+}))
 
 
 //Body-parser
@@ -79,7 +82,7 @@ function urlsForUser(id) {
 /////////////////////////// HOME PAGE ///////////////////////////////////
 
 app.get('/urls', (req, res) => {
-  const user_id = req.cookies['user_id'];
+  const user_id = req.session.user_id;
   const urls = urlsForUser(user_id);
 
   const templateVars = {
@@ -92,7 +95,7 @@ app.get('/urls', (req, res) => {
 /////////////////////////// TO ADD NEW URL ///////////////////////////////////
 
 app.get('/urls/new', (req, res) => {
-  const user_id = req.cookies['user_id']
+  const user_id = req.session.user_id;
   const templateVars = {
     urls: urlDatabase,
     user: users[user_id]
@@ -103,7 +106,7 @@ app.get('/urls/new', (req, res) => {
 app.post('/new', (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
-  const userId = req.cookies['user_id']
+  const userId = req.session.user_id;
 
   req.body.shortURL = shortURL;
 
@@ -125,7 +128,7 @@ app.post('/new', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   // app.get takes user request urls/:${shortURL} and it is added in  req.params object
-  const user_id = req.cookies['user_id']
+  const user_id = req.session.user_id;
   const shortURL = req.params.shortURL;
   const templateVars =
   {
@@ -169,7 +172,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
 
 
 app.get('/login', (req, res) => {
-  const user_id = req.cookies['user_id'];
+  const user_id = req.session.user_id;
   const templateVars = {
     user: users[user_id]
   }
@@ -188,7 +191,7 @@ app.post('/login', (req, res) => {
     if (bcrypt.compareSync(password, user.password)) {
       //Finding and applying cookies. Check inspect/application/cookies in browser to see what happens upon logIN
       const userId = user.userId;
-      res.cookie('user_id', userId)
+      req.session.user_id = userId
       //Then redirect the page to appropriate header
       res.redirect('/urls');
       return;
@@ -204,14 +207,15 @@ app.post('/login', (req, res) => {
 
 app.post('/logout', (req, res) => {
   //Check inspect/application/cookies in browser to see what happens upon logOUT
-  res.clearCookie('user_id');
+  req.session = null
+
   res.redirect('/urls');
 })
 
 /////////////////////////////  REGISTRATION  ///////////////////////////////////////
 
 app.get('/register', (req, res) => {
-  const user_id = req.cookies['user_id']
+  const user_id = req.session.user_id;
   const templateVars = {
     user: users[user_id]
   }
@@ -241,7 +245,7 @@ app.post('/register', (req, res) => {
   users[userId] = newUser;
 
   //Set cookies for newUser. Use user's unique 'userId' as cookie.
-  res.cookie('user_id', userId)
+  req.session.user_id = userId
 
   res.redirect('/urls')
 })
