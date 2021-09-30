@@ -1,8 +1,10 @@
 
+//Generate a random string that is 6 letters (alpabets/numbers) long.
 function generateRandomString() {
   return Math.random().toString(20).substr(2, 6);
 }
 
+// Returns a User OBJECT IF user found, else false.
 function checkUser(email, users) {
   for (let user in users) {
     const temp = users[user].email;
@@ -13,6 +15,7 @@ function checkUser(email, users) {
   return false;
 }
 
+// Returns User OBJECT from DB based on userId(which is unique)
 function urlsForUser(id, database) {
   let output = {};
 

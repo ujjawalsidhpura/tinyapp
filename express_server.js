@@ -5,12 +5,11 @@ const app = express();
 const PORT = 8080;
 
 //Cookie-Session (encrypted)
-const cookieSession = require('cookie-session')
+const cookieSession = require('cookie-session');
 app.use(cookieSession({
   name: 'session',
   keys: ['Test This is my key one', 'This is just some jiberjibar']
-}))
-
+}));
 
 //Body-parser
 const bodyParser = require('body-parser');
@@ -45,10 +44,11 @@ const users = {
   //   '1da9g2': { userId: '1da9g2', email: 'x@gmail.com', password: '123' }
   // }
 };
-/////////////////////////// HELPER FUNCTIONS //////////////////////
+
+/////////////////////////// HELPER FUNCTIONS ///////////////////////////
 
 const { generateRandomString, checkUser, urlsForUser } =
-  require('./helpers')
+  require('./helpers');
 
 /////////////////////////// HOME PAGE ///////////////////////////////////
 
@@ -63,16 +63,16 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-/////////////////////////// TO ADD NEW URL ///////////////////////////////////
+/////////////////////////// TO ADD NEW URL /////////////////////////////
 
 app.get('/urls/new', (req, res) => {
   const user_id = req.session.user_id;
   const templateVars = {
     urls: urlDatabase,
     user: users[user_id]
-  }
+  };
   res.render('urls_new', templateVars);
-})
+});
 
 app.post('/new', (req, res) => {
   const shortURL = generateRandomString();
@@ -87,14 +87,14 @@ app.post('/new', (req, res) => {
 
   // We have shortURL, LongURL and userID. 
   // We can inject that into our Original Database object with key:value pair -->
-  urlDatabase[shortURL] = { longURL, userId }
+  urlDatabase[shortURL] = { longURL, userId };
   console.log(urlDatabase);
 
   res.redirect(`/urls/${shortURL}`);
-})
+});
 
 
-////////////////////////////////////////////////////////////////
+//////////////////////   OTHER ROUTES  ///////////////////////////////
 //IMP-> ':' before shortURL signifies that shortURL is added dynamically. We do not use ':' for actual output.-->
 
 app.get('/urls/:shortURL', (req, res) => {
@@ -111,7 +111,7 @@ app.get('/urls/:shortURL', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
-//////////////////////////////// DELETING ENTRY FROM DATABASE  ////////////////////////////////////
+////////////////// DELETING ENTRY FROM DATABASE  /////////////
 
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
@@ -122,7 +122,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 })
 
 
-//////////////////////////// UPDATE THE ENTRY IN DATABASE  ////////////////////////////////////////
+///////////////// UPDATE THE ENTRY IN DATABASE  /////////////////
 
 app.post('/urls/:shortURL/update', (req, res) => {
 
@@ -136,10 +136,10 @@ app.post('/urls/:shortURL/update', (req, res) => {
   //Update
   urlDatabase[shortURL].longURL = longURL;
 
-  res.redirect('/urls')
-})
+  res.redirect('/urls');
+});
 
-/////////////////////////////// LOGIN / LOGOUT and COOKIE  /////////////////////////////////////
+////////////// LOGIN-LOGOUT and COOKIE  //////////////////////////
 
 
 app.get('/login', (req, res) => {
@@ -174,23 +174,23 @@ app.post('/login', (req, res) => {
   } else {
     res.status(403).send(`No user named : '${email}' found`);
   }
-})
+});
 
 app.post('/logout', (req, res) => {
   //Check inspect/application/cookies in browser to see what happens upon logOUT
-  req.session = null
+  req.session = null;
 
   res.redirect('/urls');
-})
+});
 
-/////////////////////////////  REGISTRATION  ///////////////////////////////////////
+//////////////////////  REGISTRATION  ///////////////////////////
 
 app.get('/register', (req, res) => {
   const user_id = req.session.user_id;
   const templateVars = {
     user: users[user_id]
   }
-  res.render('urls_register', templateVars)
+  res.render('urls_register', templateVars);
 });
 
 app.post('/register', (req, res) => {
@@ -199,6 +199,7 @@ app.post('/register', (req, res) => {
   // const password = req.body.password; --> non hashed password
   const password = bcrypt.hashSync(req.body.password, salt);
 
+  //Check if either Inputs are empty
   if (email === '' || password === '') {
     res.status(401).send('<h2> Please enter a valid email/password. </h2>');
     return;
@@ -221,7 +222,7 @@ app.post('/register', (req, res) => {
   res.redirect('/urls')
 })
 
-//////////////////////////////////////////////////////////////////
+////////////////  SHORT-URL REDIRECT ////////////////////////
 
 app.get("/u/:shortURL", (req, res) => {
   //You can get shortURL from req.params object and since form is submitted, urldatabase should have key:value pair of shortURL:longURL. Hence you can access longURL from urlDatabase
