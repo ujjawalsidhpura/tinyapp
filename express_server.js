@@ -1,19 +1,25 @@
+//Dependencies//
+
 const express = require('express');
-const cookieParser = require('cookie-parser')
 const app = express();
-app.use(cookieParser());
 const PORT = 8080;
 
-//Use body parser for FORM POST requests
+//Cookie-parser
+const cookieParser = require('cookie-parser')
+app.use(cookieParser());
+
+
+//Body-parser
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set('view engine', 'ejs');
-////////////////////////////////////////////////////////////////////
 
-//Database
+///////////////////////////  DATABASE  //////////////////////////////////
+
 const urlDatabase = {
-  // Format as below-->
+  // Format of this object-->
+
   // b6UTxQ: {
   //   longURL: "https://www.tsn.ca",
   //   userId: "aJ48lW"
@@ -25,16 +31,16 @@ const urlDatabase = {
 };
 
 const users = {
-  // Format as below-->
+  // Format of this object-->
+
   // {
   //   '8jej85': { userId: '8jej85', email: 'abc@gmail.com', password: '123' },
   //   '1da9g2': { userId: '1da9g2', email: 'x@gmail.com', password: '123' }
   // }
 };
 
-//////////////////////////////////////////////////////////////
+/////////////////////////// HELPER FUNCTIONS ///////////////////////////////////
 
-//Helper Functions 
 function generateRandomString() {
   return Math.random().toString(20).substr(2, 6);
 }
@@ -66,7 +72,8 @@ function urlsForUser(id) {
   return output
 }
 
-////////////////////////////////////////////////////////////////////
+/////////////////////////// HOME PAGE ///////////////////////////////////
+
 app.get('/urls', (req, res) => {
   const user_id = req.cookies['user_id'];
   const urls = urlsForUser(user_id);
@@ -77,6 +84,8 @@ app.get('/urls', (req, res) => {
   };
   res.render('urls_index', templateVars);
 });
+
+/////////////////////////// TO ADD NEW URL ///////////////////////////////////
 
 app.get('/urls/new', (req, res) => {
   const user_id = req.cookies['user_id']
@@ -92,18 +101,16 @@ app.post('/new', (req, res) => {
   const longURL = req.body.longURL;
   const userId = req.cookies['user_id']
 
-  //req.body is the object where FORM is sending the POST request of longURL. So to access it, we can do 'req.body.longURL'.
-  //Similarly, to inject shortURL generated ramdomly by our func, we inject into req.body object by the following command below-->
   req.body.shortURL = shortURL;
 
-  // We have shortURL and LongURl. We can inject that into our Original Database object with key:value pair -->
+  //ShortURL is randomly generated to be assigned 
+  //LongURL is coming from the /POST FORM. Check /new form to understand. Form input gives us name=longURL.         We can extract that from req.body.longURL
+  //user_id is the cookie that is generated and assigned to user upon registering. Check /register POST method to understand how user_id is assigned
+
+  // We have shortURL, LongURL and userID. 
+  // We can inject that into our Original Database object with key:value pair -->
   urlDatabase[shortURL] = { longURL, userId }
   console.log(urlDatabase);
-
-  //Console log to double-check
-  // console.log(urlDatabase);
-
-  //Once form is submitted, Redirect to with the current shortURL as parameter. It will call app.get('urls/:shortURL'). 
 
   res.redirect(`/urls/${shortURL}`);
 })
@@ -125,8 +132,9 @@ app.get('/urls/:shortURL', (req, res) => {
 
   res.render('urls_show', templateVars);
 });
-////////////////////////////////////////////////////////////////////
-//DELETING the entry from Database
+
+//////////////////////////////// DELETING ENTRY FROM DATABASE  ////////////////////////////////////
+
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
   //delete the item
@@ -134,8 +142,9 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
   res.redirect('/urls');
 })
-////////////////////////////////////////////////////////////////////
-//UPDATE the entry in Database
+
+
+//////////////////////////// UPDATE THE ENTRY IN DATABASE  ////////////////////////////////////////
 
 app.post('/urls/:shortURL/update', (req, res) => {
 
@@ -151,8 +160,9 @@ app.post('/urls/:shortURL/update', (req, res) => {
 
   res.redirect('/urls')
 })
-////////////////////////////////////////////////////////////////////
-// LOGIN/LOGOUT and COOKIE Functionality
+
+/////////////////////////////// LOGIN / LOGOUT and COOKIE  /////////////////////////////////////
+
 
 app.get('/login', (req, res) => {
   const user_id = req.cookies['user_id'];
@@ -168,15 +178,18 @@ app.post('/login', (req, res) => {
 
   const user = checkUser(email, users);
 
+  //checkUser function will return a user object in format user : {id,email,password}
+
   if (user) {
     if (user.password === password) {
-      //Finding and applying cookies
+      //Finding and applying cookies. Check inspect/application/cookies in browser to see what happens upon logIN
       const userId = user.userId;
       res.cookie('user_id', userId)
       //Then redirect the page to appropriate header
       res.redirect('/urls');
       return;
     } else {
+      //If password is Not correct
       res.status(403).send('Password Incorrect! Please try again.');
       return;
     }
@@ -186,13 +199,12 @@ app.post('/login', (req, res) => {
 })
 
 app.post('/logout', (req, res) => {
+  //Check inspect/application/cookies in browser to see what happens upon logOUT
   res.clearCookie('user_id');
   res.redirect('/urls');
 })
 
-////////////////////////////////////////////////////////////////////
-
-//Registration
+/////////////////////////////  REGISTRATION  ///////////////////////////////////////
 
 app.get('/register', (req, res) => {
   const user_id = req.cookies['user_id']
@@ -213,23 +225,27 @@ app.post('/register', (req, res) => {
   }
   //Check if the user already exists
   let newUser = checkUser(email, users);
+
   if (newUser) {
     res.status(401).send('<h2>User already registered. Please login</h2>')
   } else {
-    //Create newUser using reg form data (if user does not already exist)
+    //IF user does Not exist, then create newUser object using email,password and unique userId.
     newUser = { userId, email, password };
   }
   //Add newUser to Users database
   users[userId] = newUser;
 
-  console.log(users)
-  //Set cookies for newUser
+  //Check users database
+  // console.log(users)
+
+  //Set cookies for newUser. Use user's unique 'userId' as cookie.
   res.cookie('user_id', userId)
 
   res.redirect('/urls')
 })
 
 //////////////////////////////////////////////////////////////////
+
 app.get("/u/:shortURL", (req, res) => {
   //You can get shortURL from req.params object and since form is submitted, urldatabase should have key:value pair of shortURL:longURL. Hence you can access longURL from urlDatabase
 
@@ -239,6 +255,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+///////////////////// APP LISTENING AT PORT 8080 //////////////////
 app.listen(PORT, () => {
   console.log(`App listening to ${PORT}`);
 });
