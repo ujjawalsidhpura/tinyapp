@@ -26,14 +26,14 @@ app.set('view engine', 'ejs');
 const urlDatabase = {
   // Format of this object-->
 
-  // b6UTxQ: {
-  //   longURL: "https://www.tsn.ca",
-  //   userId: "aJ48lW"
-  // },
-  // i3BoGr: {
-  //   longURL: "https://www.google.ca",
-  //   userId: "aJ48lW"
-  // }
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userId: "aJ48lW"
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userId: "aJ48lW"
+  }
 };
 
 const users = {
@@ -47,13 +47,29 @@ const users = {
 
 /////////////////////////// HELPER FUNCTIONS ///////////////////////////
 
-const { generateRandomString, checkUser, urlsForUser } =
-  require('./helpers');
+const { generateRandomString, checkUser, urlsForUser, shortURLCheck } = require('./helpers');
 
 /////////////////////////// HOME PAGE ///////////////////////////////////
 
+app.get('/', (req, res) => {
+  const user_id = req.session.user_id;
+  if (!user_id) {
+    res.redirect('/login');
+    return;
+  }
+
+  const urls = urlsForUser(user_id, urlDatabase);
+
+  const templateVars = {
+    urls: urls,
+    user: users[user_id]
+  };
+  res.render('urls_index', templateVars);
+});
+
 app.get('/urls', (req, res) => {
   const user_id = req.session.user_id;
+
   const urls = urlsForUser(user_id, urlDatabase);
 
   const templateVars = {
@@ -67,6 +83,11 @@ app.get('/urls', (req, res) => {
 
 app.get('/urls/new', (req, res) => {
   const user_id = req.session.user_id;
+  if (!user_id) {
+    res.redirect('/login');
+    return;
+  }
+
   const templateVars = {
     urls: urlDatabase,
     user: users[user_id]
@@ -101,6 +122,20 @@ app.get('/urls/:shortURL', (req, res) => {
   // app.get takes user request urls/:${shortURL} and it is added in  req.params object
   const user_id = req.session.user_id;
   const shortURL = req.params.shortURL;
+  const shortUrlObject = shortURLCheck(shortURL, urlDatabase);
+
+  if (!user_id) {
+    res.status(403).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> No user logged in! </div>');
+  }
+
+  if (!shortUrlObject) {
+    res.status(403).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> No such Short URL found!!! </div>');
+  };
+
+  if (shortUrlObject.userId !== user_id) {
+    res.status(403).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px">No such URL in this User database </div>');
+  };
+
   const templateVars =
   {
     shortURL: shortURL,
@@ -109,6 +144,7 @@ app.get('/urls/:shortURL', (req, res) => {
   };
 
   res.render('urls_show', templateVars);
+
 });
 
 ////////////////// DELETING ENTRY FROM DATABASE  /////////////
@@ -228,7 +264,7 @@ app.get("/u/:shortURL", (req, res) => {
   //You can get shortURL from req.params object and since form is submitted, urldatabase should have key:value pair of shortURL:longURL. Hence you can access longURL from urlDatabase
 
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[shortURL].longURL;
 
   res.redirect(longURL);
 });

@@ -33,4 +33,17 @@ function urlsForUser(id, database) {
   return output
 }
 
-module.exports = { generateRandomString, checkUser, urlsForUser };
+//Function to check if shortURL exist in DB
+function shortURLCheck(targetUrl, db) {
+
+  for (let url in db) {
+    if (url === targetUrl) {
+      return db[url];
+    }
+  }
+  return null;
+}
+
+
+module.exports =
+  { generateRandomString, checkUser, urlsForUser, shortURLCheck };
