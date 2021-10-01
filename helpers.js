@@ -44,6 +44,17 @@ function shortURLCheck(targetUrl, db) {
   return null;
 }
 
+//HTML message maker
+
+function HTMLMessageMaker(message) {
+  const htmlMessage =
+    `<div 
+    style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px; font-size:21px"> 
+    ${message} 
+    </div>`
+  return htmlMessage;
+}
+
 
 module.exports =
-  { generateRandomString, checkUser, urlsForUser, shortURLCheck };
+  { generateRandomString, checkUser, urlsForUser, shortURLCheck, HTMLMessageMaker };

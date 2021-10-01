@@ -47,7 +47,7 @@ const users = {
 
 /////////////////////////// HELPER FUNCTIONS ///////////////////////////
 
-const { generateRandomString, checkUser, urlsForUser, shortURLCheck } = require('./helpers');
+const { generateRandomString, checkUser, urlsForUser, shortURLCheck, HTMLMessageMaker } = require('./helpers');
 
 /////////////////////////// HOME PAGE ///////////////////////////////////
 
@@ -125,15 +125,15 @@ app.get('/urls/:shortURL', (req, res) => {
   const shortUrlObject = shortURLCheck(shortURL, urlDatabase);
 
   if (!user_id) {
-    res.status(403).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> No user logged in! </div>');
+    res.status(403).send(HTMLMessageMaker('No user logged in! User must log in.'));
   }
 
   if (!shortUrlObject) {
-    res.status(403).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> No such Short URL found!!! </div>');
+    res.status(403).send(HTMLMessageMaker('No such ShortURL found!!'));
   };
 
   if (shortUrlObject.userId !== user_id) {
-    res.status(403).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px">No such URL in this User database </div>');
+    res.status(403).send(HTMLMessageMaker('No such URL in this User Database'));
   };
 
   const templateVars =
@@ -204,11 +204,11 @@ app.post('/login', (req, res) => {
       return;
     } else {
       //If password is Not correct
-      res.status(403).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> Password Incorrect! Please try again.</div>');
+      res.status(403).send(HTMLMessageMaker('Password Incorret! Please try again.'));
       return;
     }
   } else {
-    res.status(403).send(`<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> No user named : '${email}' found.     </div>`);
+    res.status(403).send(HTMLMessageMaker(`No user registered with ${email}`));
   }
 });
 
@@ -237,14 +237,14 @@ app.post('/register', (req, res) => {
 
   //Check if either Inputs are empty
   if (email === '' || password === '') {
-    res.status(401).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> Please Enter a valid E-Mail/Password</div>');
+    res.status(401).send(HTMLMessageMaker('Please enter a valid Email Or Password'));
     return;
   }
   //Check if the user already exists
   let newUser = checkUser(email, users);
 
   if (newUser) {
-    res.status(401).send('<div style="height: 30px; width: 50%; border: 2px black solid; border-radius: 5px; margin:auto; padding: 10px; text-align:center; margin-top:25px"> User already Registered.Please login</div>')
+    res.status(401).send(HTMLMessageMaker('This email is already registered.Please login.'))
   } else {
     //IF user does Not exist, then create newUser object using email,password and unique userId.
     newUser = { userId, email, password };
