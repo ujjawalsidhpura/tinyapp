@@ -126,14 +126,17 @@ app.get('/urls/:shortURL', (req, res) => {
 
   if (!user_id) {
     res.status(403).send(HTMLMessageMaker('No user logged in! User must log in.'));
+    return;
   }
 
   if (!shortUrlObject) {
     res.status(403).send(HTMLMessageMaker('No such ShortURL found!!'));
+    return;
   };
 
   if (shortUrlObject.userId !== user_id) {
     res.status(403).send(HTMLMessageMaker('No such URL in this User Database'));
+    return;
   };
 
   const templateVars =
@@ -150,12 +153,17 @@ app.get('/urls/:shortURL', (req, res) => {
 ////////////////// DELETING ENTRY FROM DATABASE  /////////////
 
 app.post('/urls/:shortURL/delete', (req, res) => {
+  const user_id = req.session.user_id;
+  if (!user_id) {
+    res.redirect('/login');
+    return;
+  }
   const shortURL = req.params.shortURL;
   //delete the item
   delete urlDatabase[shortURL];
 
   res.redirect('/urls');
-})
+});
 
 
 ///////////////// UPDATE THE ENTRY IN DATABASE  /////////////////
@@ -244,7 +252,8 @@ app.post('/register', (req, res) => {
   let newUser = checkUser(email, users);
 
   if (newUser) {
-    res.status(401).send(HTMLMessageMaker('This email is already registered.Please login.'))
+    res.status(401).send(HTMLMessageMaker('This email is already registered.Please login.'));
+    return;
   } else {
     //IF user does Not exist, then create newUser object using email,password and unique userId.
     newUser = { userId, email, password };
