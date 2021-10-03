@@ -95,7 +95,7 @@ app.get('/urls/new', (req, res) => {
   res.render('urls_new', templateVars);
 });
 
-app.post('/new', (req, res) => {
+app.post('/urls/new', (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
   const userId = req.session.user_id;
@@ -150,6 +150,22 @@ app.get('/urls/:shortURL', (req, res) => {
 
 });
 
+///////////////// UPDATE THE ENTRY IN DATABASE  /////////////////
+
+app.post('/urls/:shortURL/', (req, res) => {
+
+  // As we can see from console, ShortURL came from params, longURL came from body.
+
+  const longURL = req.body.longURL;
+  const shortURL = req.params.shortURL;
+
+  //Update
+  urlDatabase[shortURL].longURL = longURL;
+
+  res.redirect('/urls');
+
+});
+
 ////////////////// DELETING ENTRY FROM DATABASE  /////////////
 app.get('/urls/:shortURL/delete', (req, res) => {
   const user_id = req.session.user_id;
@@ -183,25 +199,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   } else {
     res.status(401).send(HTMLMessageMaker('No such URL in this user Database.'));
   }
-});
-
-
-///////////////// UPDATE THE ENTRY IN DATABASE  /////////////////
-
-app.post('/urls/:shortURL/update', (req, res) => {
-
-  // console.log('Params', req.params)
-  // console.log('Body', req.body)
-  // As we can see from console, ShortURL came from params, longURL came from body.
-
-  const longURL = req.body.longURL;
-  const shortURL = req.params.shortURL;
-
-  //Update
-  urlDatabase[shortURL].longURL = longURL;
-
-  res.redirect('/urls');
-
 });
 
 ////////////// LOGIN-LOGOUT and COOKIE  //////////////////////////
