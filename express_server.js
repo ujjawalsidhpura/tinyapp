@@ -151,6 +151,22 @@ app.get('/urls/:shortURL', (req, res) => {
 });
 
 ////////////////// DELETING ENTRY FROM DATABASE  /////////////
+app.get('/urls/:shortURL/delete', (req, res) => {
+  const user_id = req.session.user_id;
+  if (!user_id) {
+    res.redirect('/login');
+    return;
+  }
+  const shortURL = req.params.shortURL;
+  if (shortURLCheck(shortURL, urlDatabase)) {
+    //IF shortURL is found in the userDB then Delete the item
+    delete urlDatabase[shortURL];
+
+    res.redirect('/urls');
+  } else {
+    res.status(401).send(HTMLMessageMaker('No such URL in this user Database.'));
+  }
+});
 
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user_id = req.session.user_id;
@@ -159,10 +175,14 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     return;
   }
   const shortURL = req.params.shortURL;
-  //delete the item
-  delete urlDatabase[shortURL];
+  if (shortURLCheck(shortURL, urlDatabase)) {
+    //IF shortURL is found in the userDB then Delete the item
+    delete urlDatabase[shortURL];
 
-  res.redirect('/urls');
+    res.redirect('/urls');
+  } else {
+    res.status(401).send(HTMLMessageMaker('No such URL in this user Database.'));
+  }
 });
 
 
