@@ -181,6 +181,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
   urlDatabase[shortURL].longURL = longURL;
 
   res.redirect('/urls');
+
 });
 
 ////////////// LOGIN-LOGOUT and COOKIE  //////////////////////////
@@ -261,7 +262,7 @@ app.post('/register', (req, res) => {
   //Add newUser to Users database
   users[userId] = newUser;
 
-  //Set cookies for newUser. Use user's unique 'userId' as cookie.
+  //Set cookies for newUser. Use user's unique 'userId' as cookie. Cookie name is user_id.
   req.session.user_id = userId
 
   res.redirect('/urls')
@@ -272,10 +273,19 @@ app.post('/register', (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   //You can get shortURL from req.params object and since form is submitted, urldatabase should have key:value pair of shortURL:longURL. Hence you can access longURL from urlDatabase
 
+  const user_id = req.session.user_id;
+  if (!user_id) {
+    res.redirect('/login');
+    return;
+  }
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
+  if (shortURLCheck(shortURL, urlDatabase)) {
+    const longURL = urlDatabase[shortURL].longURL;
 
-  res.redirect(longURL);
+    res.redirect(longURL);
+  } else {
+    res.status(401).send(HTMLMessageMaker('No such URL in this user Database.'));
+  }
 });
 
 ///////////////////// APP LISTENING AT PORT 8080 //////////////////
