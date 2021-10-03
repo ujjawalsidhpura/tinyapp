@@ -29,7 +29,6 @@ function urlsForUser(id, database) {
   if (Object.keys(output).length === 0) {
     return false;
   }
-
   return output
 }
 

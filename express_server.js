@@ -69,7 +69,10 @@ app.get('/', (req, res) => {
 
 app.get('/urls', (req, res) => {
   const user_id = req.session.user_id;
-
+  if (!user_id) {
+    res.redirect('/login');
+    return;
+  }
   const urls = urlsForUser(user_id, urlDatabase);
 
   const templateVars = {
@@ -95,7 +98,7 @@ app.get('/urls/new', (req, res) => {
   res.render('urls_new', templateVars);
 });
 
-app.post('/urls/new', (req, res) => {
+app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
   const userId = req.session.user_id;
@@ -153,9 +156,6 @@ app.get('/urls/:shortURL', (req, res) => {
 ///////////////// UPDATE THE ENTRY IN DATABASE  /////////////////
 
 app.post('/urls/:shortURL/', (req, res) => {
-
-  // As we can see from console, ShortURL came from params, longURL came from body.
-
   const longURL = req.body.longURL;
   const shortURL = req.params.shortURL;
 
@@ -167,14 +167,16 @@ app.post('/urls/:shortURL/', (req, res) => {
 });
 
 ////////////////// DELETING ENTRY FROM DATABASE  /////////////
+
 app.get('/urls/:shortURL/delete', (req, res) => {
   const user_id = req.session.user_id;
   if (!user_id) {
     res.redirect('/login');
     return;
   }
+
   const shortURL = req.params.shortURL;
-  if (shortURLCheck(shortURL, urlDatabase)) {
+  if (urlsForUser(user_id, urlDatabase)) {
     //IF shortURL is found in the userDB then Delete the item
     delete urlDatabase[shortURL];
 
@@ -190,8 +192,9 @@ app.post('/urls/:shortURL/delete', (req, res) => {
     res.redirect('/login');
     return;
   }
+
   const shortURL = req.params.shortURL;
-  if (shortURLCheck(shortURL, urlDatabase)) {
+  if (urlsForUser(user_id, urlDatabase)) {
     //IF shortURL is found in the userDB then Delete the item
     delete urlDatabase[shortURL];
 
@@ -202,7 +205,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 ////////////// LOGIN-LOGOUT and COOKIE  //////////////////////////
-
 
 app.get('/login', (req, res) => {
   const user_id = req.session.user_id;
